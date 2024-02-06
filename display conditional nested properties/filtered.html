@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Display</title>
+</head>
+
+<body>
+    <div id="output"></div>
+    <div class="options">
+        <button class="btn" data-option="army">Army of the North</button>
+        <button class="btn" data-option="ming">Ming Dynasty</button>
+        <button class="btn" data-option="sung">Sung Kingdom</button>
+    </div>
+    <script>
+
+        const btns = document.querySelectorAll('.btn');
+
+        const options = {
+            mingDynasty: false,
+            sungKingdom: false,
+            armyOfTheNorth: false
+        };
+
+        const data = [
+            {
+                name: 'Royal Guard',
+                weapons: {
+                    default: 'swords',
+                    mingDynasty: 'lassos',
+                    sungKingdom: 'spears'
+                },
+                size: 'large',
+                amount: {
+                    min: 2,
+                    max: {
+                        default: 4,
+                        sungKingdom: 6
+                    }
+                }
+            },
+            {
+                name: 'Jannisaeres',
+                weapons: {
+                    mingDynasty: 'scimitars',
+                    default: 'guns'
+                },
+                size: {
+                    default: 'large',
+                    armyOfTheNorth: 'deep'
+                },
+                amount: {
+                    min: {
+                        default: 0,
+                        mingDynasty: {
+                            default: 2,
+                            armyOfTheNorth: 19
+                        }
+                    },
+                    max: 4
+                }
+            },
+            {
+                name: 'Dark Knights',
+                weapons: 'Electro Lances',
+                size: {
+                    default: 'small',
+                    armyOfTheNorth: 'regular'
+                },
+                amount: {
+                    min: {
+                        default: 0,
+                        armyOfTheNorth: 2
+                    },
+                    max: 8
+                }
+            }
+        ];
+
+        function displayEntities() {
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '<h2>Filtered Entities:</h2>';
+
+            data.forEach(unit => {
+                outputDiv.innerHTML += `<h3>${unit.name}</h3> 
+                <p>Weapons: ${getSelectedOption(unit.weapons)}</p>
+                <p>Size: ${getSelectedOption(unit.size)}</p>
+                <p>Min: ${getSelectedOption(unit.amount.min)}, Max: ${getSelectedOption(unit.amount.max)}</p>
+                `;
+            });
+        }
+
+        function getSelectedOption(unitKey) {
+            if (typeof unitKey === 'object') {
+                for (optionsKey in options) {
+                    if (options[optionsKey] && unitKey[optionsKey]) {
+                        // If unitKey[optionsKey] is also an object, we did deeper by running the func again ('recursively')
+                        // with unitKey[optionsKey] as argument:
+                        if (typeof unitKey[optionsKey] === 'object') {
+                            return getSelectedOption(unitKey[optionsKey])
+                        } else {
+                            return unitKey[optionsKey];
+                        }
+                    }
+                }
+
+                // If no options match the unitKey properties (=optionsKey), get the .default key value:
+                return Object.hasOwn(unitKey, 'default') ? unitKey.default : 'None';
+            } else {
+                // If unitKey is not an object, just return the value of the unitKey:
+                return unitKey;
+            }
+        }
+
+        const toggleOption = (e) => {
+            if (e.target.dataset.option === 'ming') { options.mingDynasty = true, options.sungKingdom = false }
+            if (e.target.dataset.option === 'sung') { options.mingDynasty = false, options.sungKingdom = true }
+            if (e.target.dataset.option === 'army') { options.armyOfTheNorth = !options.armyOfTheNorth }
+            console.log(options)
+            displayEntities();
+        }
+
+        btns.forEach(btn => {
+            btn.addEventListener('click', toggleOption)
+        });
+
+        // Initial display
+        displayEntities();
+    </script>
+</body>
+
+</html>
